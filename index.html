@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1B2A41" />
+  <meta name="description" content="ExSimplify — expenses, simplified. Track UAE subscriptions, bills, renewals and car costs with smart reminders." />
+  <title>ExSimplify — Expenses, simplified</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">Ex</span>
+      <div>
+        <h1>ExSimplify</h1>
+        <p class="tagline">Expenses, simplified</p>
+      </div>
+    </div>
+    <div class="auth-area" id="authArea">
+      <button class="btn btn-ghost" id="signInBtn" hidden>Sign in</button>
+      <button class="avatar-btn" id="userBtn" hidden title="Sign out">
+        <img id="userAvatar" alt="Account" referrerpolicy="no-referrer" />
+      </button>
+    </div>
+  </header>
+
+  <div class="banner banner-setup" id="setupBanner" hidden>
+    <strong>Local mode.</strong> Data is saved on this device only. Add your Firebase config in <code>js/config.js</code> to enable sign-in and sync. See README.
+  </div>
+
+  <div class="banner banner-warn" id="insuranceWarning" hidden></div>
+
+  <main>
+    <!-- ============ HOME VIEW ============ -->
+    <div id="homeView">
+      <section class="runway-card" aria-label="Next 12 months">
+        <div class="runway-head">
+          <h2>Next 12 months</h2>
+          <span class="runway-legend">
+            <i class="dot dot-overdue"></i>overdue
+            <i class="dot dot-critical"></i>act now
+            <i class="dot dot-soon"></i>soon
+            <i class="dot dot-ok"></i>later
+          </span>
+        </div>
+        <div class="runway" id="runway"></div>
+        <div class="runway-months" id="runwayMonths"></div>
+      </section>
+
+      <section class="summary" aria-label="Spending summary">
+        <div class="stat">
+          <span class="stat-label">Monthly burn</span>
+          <span class="stat-value" id="monthlyBurn">AED 0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Annual total</span>
+          <span class="stat-value" id="annualBurn">AED 0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Due this month</span>
+          <span class="stat-value" id="dueMonth">AED 0</span>
+        </div>
+      </section>
+
+      <section class="list-section">
+        <div class="list-head">
+          <h2>Needs your attention</h2>
+          <button class="btn btn-ghost btn-sm" id="notifyBtn" title="Enable reminder notifications">🔔 Reminders</button>
+        </div>
+        <div id="urgentList"></div>
+        <p class="all-clear" id="allClear" hidden>✅ Nothing urgent. Everything's handled.</p>
+      </section>
+
+      <section class="list-section" id="cancelSection" hidden>
+        <h2 class="section-title">Cancel candidates</h2>
+        <p class="section-hint">Your subscriptions, most expensive first. Anything here you don't use?</p>
+        <div id="cancelList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TAB VIEW (Subs / Bills / Renewals / Car) ============ -->
+    <div id="tabView" hidden>
+      <section class="summary summary-2" aria-label="Tab summary">
+        <div class="stat">
+          <span class="stat-label" id="tabTotalLabel">Monthly total</span>
+          <span class="stat-value" id="tabTotal">AED 0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Items</span>
+          <span class="stat-value" id="tabCount">0</span>
+        </div>
+      </section>
+      <section class="list-section">
+        <div id="itemsList"></div>
+        <div class="empty" id="emptyState" hidden>
+          <p class="empty-big" id="emptyTitle">Nothing here yet.</p>
+          <p id="emptyHint"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <button class="fab" id="addBtn" aria-label="Add expense">+</button>
+
+  <!-- ============ BOTTOM TAB BAR ============ -->
+  <nav class="tabbar" aria-label="Sections">
+    <button class="tab active" data-tab="home"><span class="tab-icon">🏠</span>Home</button>
+    <button class="tab" data-tab="subs"><span class="tab-icon">📺</span>Subs</button>
+    <button class="tab" data-tab="bills"><span class="tab-icon">🧾</span>Bills</button>
+    <button class="tab" data-tab="renewals"><span class="tab-icon">🛂</span>Renewals</button>
+    <button class="tab" data-tab="car"><span class="tab-icon">🚗</span>Car</button>
+  </nav>
+
+  <!-- ============ ADD / EDIT MODAL ============ -->
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Add expense</h2>
+
+      <label class="field">
+        <span>Type</span>
+        <select id="fCategory"></select>
+      </label>
+
+      <label class="field">
+        <span>Name</span>
+        <input id="fName" type="text" placeholder="e.g. Netflix Premium, Golf insurance" maxlength="60" />
+      </label>
+
+      <label class="field" id="vehicleField" hidden>
+        <span>Vehicle (used to match insurance ↔ registration)</span>
+        <input id="fVehicle" type="text" placeholder="e.g. Golf" maxlength="30" />
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Amount (AED)</span>
+          <input id="fAmount" type="number" min="0" step="0.01" placeholder="0" inputmode="decimal" />
+        </label>
+        <label class="field">
+          <span>Repeats</span>
+          <select id="fFrequency">
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly" selected>Yearly</option>
+            <option value="twoyear">Every 2 years</option>
+            <option value="threeyear">Every 3 years</option>
+            <option value="fiveyear">Every 5 years</option>
+            <option value="tenyear">Every 10 years</option>
+            <option value="onetime">One-time</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Next due date</span>
+          <input id="fDueDate" type="date" required />
+        </label>
+        <label class="field">
+          <span>Remind me (days before)</span>
+          <input id="fLead" type="number" min="0" max="365" inputmode="numeric" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Notes (optional)</span>
+        <input id="fNotes" type="text" placeholder="Policy no., account, provider…" maxlength="120" />
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="deleteBtn" hidden>Delete</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

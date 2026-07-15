@@ -1,0 +1,13 @@
+# Cloudflare Pages headers — keeps deploys fresh on installed PWAs
+
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.json
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+/icons/*
+  Cache-Control: public, max-age=604800
