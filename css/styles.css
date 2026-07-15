@@ -224,3 +224,5 @@ body { padding-bottom: 140px; }
 .section-title { font-family: var(--display); font-size: 16px; margin: 0 0 2px; }
 .section-hint { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
 .all-clear { color: var(--green); font-weight: 600; padding: 12px 2px; }
+[hidden] { display: none !important; }
+.modal-backdrop[hidden] { display: none !important; }
