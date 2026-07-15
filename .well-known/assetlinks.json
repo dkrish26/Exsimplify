@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "ae.dkrishnaa26.exsimplify.twa",
+        "sha256_cert_fingerprints": ["5E:75:28:CE:5C:5E:DC:62:26:63:8C:16:AA:BE:D7:27:E9:3C:37:B7:5A:72:55:B1:A0:62:4B:7C:73:12:C0:7A"]
+      }
+    }]
