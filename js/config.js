@@ -13,12 +13,12 @@
    ============================================================ */
 
 export const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID",
+  apiKey: "AIzaSyB5X6Iu9fCMtY9US6LiOE-SKwmD49ae6No",
+  authDomain: "exsimplify-9ec79.firebaseapp.com",
+  projectId: "exsimplify-9ec79",
+  storageBucket: "exsimplify-9ec79.firebasestorage.app",
+  messagingSenderId: "817331530751",
+  appId: "1:817331530751:web:55ce205962fb8d11a115ca",
 };
 
 export const FIREBASE_READY = !firebaseConfig.apiKey.startsWith("PASTE_");
